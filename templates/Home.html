@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HomePage</title>
+
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined">
+
+    <style>
+        html {
+            overflow-y: scroll;
+            scroll-behavior: smooth;
+        }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(rgba(0, 77, 128, 0.7), rgba(0, 122, 204, 0.7)), url("{{ url_for('static', filename='BG.jpg') }}");
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            margin: 0;
+            min-height: 100vh;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        nav {
+            width: 100%;
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 999;
+        }
+
+        .navtitle {
+            font-size: 20px;
+            font-weight: 700;
+            color: #004d80;
+        }
+
+        .navbutton {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .navbutton a, 
+        .dropbtn {
+            text-decoration: none;
+            color: #007acc;
+            font-weight: 500;
+            padding: 8px 16px;
+            border: 2px solid #007acc;
+            border-radius: 20px;
+            transition: 0.3s ease;
+            font-size: 14px;
+            background: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .navbutton a:hover, 
+        .dropbtn:hover {
+            background: #007acc;
+            color: white;
+        }
+
+        .dropdown {
+            position: relative;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+            padding: 8px 0;
+            min-width: 60px;
+            z-index: 10;
+        }
+
+        .dropdown-content a {
+            all: unset;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 45px;
+            height: 40px;
+            margin: 4px auto;
+            cursor: pointer;
+            border-radius: 10px;
+        }
+
+        .dropdown-content a i {
+            font-size: 22px;
+            color: #007acc;
+            transition: 0.2s;
+        }
+
+        .dropdown-content a:hover {
+            background: #e6f3ff;
+        }
+
+        .dropdown-content a:hover i {
+            color: #004d80;
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        .aboutcontainer {
+            max-width: 900px;
+            margin: 50px auto 50px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(15px);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            animation: fadeInUp 1s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h2 {
+            text-align: center;
+            color: #004d80;
+            margin-bottom: 30px;
+            font-size: 32px;
+            font-weight: 700;
+            position: relative;
+        }
+
+        h2::after {
+            content: '';
+            display: block;
+            width: 60px;
+            height: 4px;
+            background: linear-gradient(to right, #007acc, #004d80);
+            margin: 10px auto;
+            border-radius: 2px;
+        }
+
+        h3 {
+            color: #004d80;
+            margin-top: 25px;
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        p {
+            text-align: justify;
+            color: #555;
+            line-height: 1.8;
+            font-size: 18px;
+        }
+
+        @media (max-width: 768px) {
+            nav { padding: 10px 15px; flex-wrap: wrap; }
+            .navtitle { width: 100%; text-align: center; margin-bottom: 10px; }
+            .navbutton { justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="navtitle">RequestHub</div>
+
+        <div class="navbutton">
+            <a href="{{ url_for('home') }}"><i class="material-icons">home</i></a>
+            <a href="{{ url_for('requestdocument') }}"><span class="material-symbols-outlined">request_page</span></a>
+            <a href="{{ url_for('myorders') }}"><span class="material-symbols-outlined">orders</span></a>
+            <a href="{{ url_for('about') }}"><i class="material-icons">info</i></a>
+            <a href="{{ url_for('notification') }}"><i class="material-icons">notifications</i></a>
+
+            <div class="dropdown">
+                <button class="dropbtn"><i class="material-icons">menu</i></button>
+                <div class="dropdown-content">
+                    <a href="{{ url_for('profile') }}"><i class="material-icons">person</i></a>
+                    <a href="{{ url_for('main') }}"><i class="material-icons">logout</i></a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="aboutcontainer">
+        <h2>Created by Jerah Enriquez</h2>
+
+        <p>
+            The ClearDocs is an online platform that lets 
+            users quickly submit requests without visiting an office.<br><br>
+
+            Purpose:<br>
+            - Allow users to request documents quickly and conveniently.<br>
+            - Help officials manage, review, and process requests efficiently.<br>
+            - Improve transparency by letting users clearly see the status of their requests.<br>
+                Users can submit document requests anytime, and officials can track and update them promptly, ensuring faster and more organized service.
+        </p>
+    </div>
+</body>
+</html>

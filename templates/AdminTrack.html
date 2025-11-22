@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Track Requests</title>
+
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined">
+
+<style>
+    html {
+        overflow-y: scroll;
+        scroll-behavior: smooth;
+    }
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    body {
+        font-family: 'Roboto', sans-serif;
+        background: linear-gradient(rgba(0, 77, 128, 0.7), rgba(0, 122, 204, 0.7)), url("{{ url_for('static', filename='BG.jpg') }}");
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+        margin: 0;
+        min-height: 100vh;
+        color: #333;
+        line-height: 1.6;
+    }
+
+    nav {
+        width: 100%;
+        background: rgba(255,255,255,0.95);
+        backdrop-filter: blur(10px);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px 30px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        position: sticky;
+        top: 0;
+        z-index: 999;
+    }
+
+    .navtitle {
+        font-size: 20px;
+        font-weight: 700;
+        color: #004d80;
+    }
+
+    .navbutton {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    .navbutton a, 
+    .dropbtn {
+        text-decoration: none;
+        color: #007acc;
+        font-weight: 500;
+        padding: 8px 16px;
+        border: 2px solid #007acc;
+        border-radius: 20px;
+        transition: 0.3s ease;
+        font-size: 14px;
+        background: white;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .navbutton a:hover, 
+    .dropbtn:hover {
+        background: #007acc;
+        color: white;
+    }
+
+    .dropdown {
+        position: relative;
+    }
+
+    .dropdown-content {
+        display: none;
+        position: absolute;
+        right: 0;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        padding: 8px 0;
+        min-width: 60px;
+        z-index: 10;
+    }
+
+    .dropdown-content a {
+        all: unset;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 45px;
+        height: 40px;
+        margin: 4px auto;
+        cursor: pointer;
+        border-radius: 10px;
+    }
+
+    .dropdown-content a i {
+        font-size: 22px;
+        color: #007acc;
+        transition: 0.2s;
+    }
+
+    .dropdown-content a:hover {
+        background: #e6f3ff;
+    }
+
+    .dropdown-content a:hover i {
+        color: #004d80;
+    }
+
+    .dropdown:hover .dropdown-content {
+        display: block;
+    }
+
+    .container {
+        max-width: 1100px;
+        margin: 50px auto;
+        background: rgba(255,255,255,0.95);
+        backdrop-filter: blur(15px);
+        padding: 40px;
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+    }
+
+    h2 {
+        text-align: center;
+        color: #004d80;
+        margin-bottom: 30px;
+        font-size: 32px;
+        font-weight: 700;
+    }
+
+    h2::after {
+        content: '';
+        display: block;
+        width: 60px;
+        height: 4px;
+        background: linear-gradient(to right, #007acc, #004d80);
+        margin: 10px auto;
+        border-radius: 2px;
+    }
+
+    .request-card {
+        background: white;
+        border-left: 5px solid #007acc;
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 15px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    .status-btn {
+        background: #007acc;
+        color: white;
+        border: none;
+        padding: 6px 12px;
+        cursor: pointer;
+        border-radius: 8px;
+        font-size: 13px;
+        white-space: nowrap;
+    }
+
+    .request-card .dropdown {
+        position: relative;
+        display: inline-block;
+    }
+
+    .request-card .dropdown-content {
+        display: none;
+        position: absolute;
+        background: white;
+        min-width: 160px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        border-radius: 8px;
+        overflow: hidden;
+        top: 110%;
+        left: 0;
+        z-index: 9999;
+    }
+
+    .request-card .dropdown-content form button {
+        width: 100%;
+        padding: 8px;
+        border: none;
+        background: white;
+        cursor: pointer;
+        text-align: left;
+        font-size: 13px;
+        white-space: nowrap;
+    }
+
+    .request-card .dropdown-content form button:hover {
+        background: #f1f1f1;
+    }
+
+    @media (max-width: 768px) {
+        nav { padding: 10px 15px; flex-wrap: wrap; }
+        .navtitle { width: 100%; text-align: center; margin-bottom: 10px; }
+        .navbutton { justify-content: center; }
+        .container { padding: 15px; }
+        .request-card { padding: 15px; }
+        .status-btn { font-size: 12px; padding: 5px 10px; }
+    }
+</style>
+</head>
+
+<body>
+
+<nav>
+    <div class="navtitle">RequestHub</div>
+    <div class="navbutton">
+        <a href="{{ url_for('admindashboard') }}"><i class="material-icons">dashboard</i></a>
+        <a href="{{ url_for('admintrack') }}"><span class="material-symbols-outlined">track_changes</span></a>
+        <a href="{{ url_for('manageuser') }}"><i class="material-icons">people</i></a>
+        <a href="{{ url_for('managerequest') }}"><span class="material-symbols-outlined">assignment</span></a>
+        <a href="{{ url_for('reviewpayment') }}"><i class="material-icons">payment</i></a>
+        <a href="{{ url_for('managedocument') }}"><i class="material-icons">description</i></a>
+        <a href="{{ url_for('requestlog') }}"><i class="material-icons">receipt_long</i></a>
+        <div class="dropdown">
+            <button class="dropbtn"><i class="material-icons">menu</i></button>
+            <div class="dropdown-content">
+                <a href="{{ url_for('main') }}"><i class="material-icons">logout</i></a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="container">
+    <h2>Update Requests</h2>
+
+    {% for req in requests %}
+    <div class="request-card">
+        <p><b>Name:</b> {{ req['fullname'] }}</p>
+        <p><b>Contact:</b> {{ req['contact'] }}</p>
+        <p><b>Address:</b> {{ req['address'] }}</p>
+        <p><b>Date:</b> {{ req['date_requested'].strftime('%Y-%m-%d') }}</p>
+        <p><b>Document:</b> {{ req['document_type'] }}</p>
+        <p><b>Purpose:</b> {{ req['purpose'] }}</p>
+        <P><B>Total Cost:</B> {{ req['cost'] }}</P>
+        <p><b>Status:</b> {{ req['status'] }}</p>
+        <div class="dropdown">
+            <button class="status-btn" onclick="toggleDropdown(this)">Change Status</button>
+            <div class="dropdown-content">
+                <form method="POST" action="{{ url_for('update_status', req_id=req['id']) }}">
+                    <button type="submit" name="status" value="Processing">Processing</button>
+                    <button type="submit" name="status" value="Ready for Delivery">Ready for Delivery</button>
+                    <button type="submit" name="status" value="Out for Delivery">Out for Delivery</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<script>
+function toggleDropdown(button) {
+    document.querySelectorAll('.request-card .dropdown-content').forEach(dc => {
+        if (dc !== button.nextElementSibling) {
+            dc.style.display = 'none';
+        }
+    });
+
+    const dropdown = button.nextElementSibling;
+    dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+}
+
+document.addEventListener('click', function(event) {
+    if (!event.target.matches('.status-btn')) {
+        document.querySelectorAll('.request-card .dropdown-content').forEach(dc => {
+            dc.style.display = 'none';
+        });
+    }
+});
+</script>
+
+</body>
+</html>

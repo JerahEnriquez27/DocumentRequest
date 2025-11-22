@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Main</title>
+</head>
+<style>
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    body {
+        font-family: 'Roboto', sans-serif;
+        background: linear-gradient(rgba(0, 77, 128, 0.7), rgba(0, 122, 204, 0.7)), url("{{ url_for('static', filename='BG.jpg') }}");
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+        margin: 0;
+        min-height: 100vh;
+        color: #333;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+    }
+
+    nav {
+        width: 100%;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px 50px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        position: fixed;
+        top: 0;
+        z-index: 1000;
+        transition: all 0.3s ease;
+    }
+
+    .navtitle {
+        font-size: 28px;
+        font-weight: 700;
+        color: #004d80;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .navbutton {
+        display: flex;
+        gap: 15px; 
+    }
+
+    .navbutton a {
+        text-decoration: none;
+        color: #007acc;
+        font-weight: 500;
+        padding: 12px 24px;
+        border: 2px solid #007acc;
+        border-radius: 25px;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+        font-size: 16px;
+    }
+
+    .navbutton a:hover {
+        background: #007acc;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(0, 122, 204, 0.3);
+    }
+
+    .navbutton a::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s;
+    }
+
+    .navbutton a:hover::before {
+        left: 100%;
+    }
+
+    .main-content {
+        margin-top: 120px;
+        max-width: 600px;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(15px);
+        padding: 50px;
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+        animation: fadeInUp 1s ease-out;
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .main-content h1 {
+        font-size: 36px;
+        color: #004d80;
+        margin-bottom: 20px;
+        font-weight: 700;
+    }
+
+    .main-content p {
+        font-size: 18px;
+        color: #555;
+        line-height: 1.8;
+        margin-bottom: 30px;
+    }
+</style>
+<body>
+    <nav>
+        <div class="navtitle">RequestHub</div>
+        <div class="navbutton">
+            <a href="{{ url_for('login') }}"><i class="fas fa-sign-in-alt"></i> Login</a>
+            <a href="{{ url_for('register') }}"><i class="fas fa-user-plus"></i> Register</a>
+        </div>
+    </nav>
+
+    <div class="main-content">
+        <h1>Welcome to ClearDocs</h1>
+        <p>
+            Streamline your document requests with our easy-to-use online platform. 
+            Whether you're requesting certificates or managing official paperwork, 
+            get started today for a hassle-free experience.
+        </p>
+    </div>
+</body>
+</html>

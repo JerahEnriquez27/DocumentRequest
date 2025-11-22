@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Track Documents</title>
+    <style>
+        html {
+            overflow-y: scroll;
+            scroll-behavior: smooth;
+        }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(rgba(0, 77, 128, 0.7), rgba(0, 122, 204, 0.7)), 
+                        url("{{ url_for('static', filename='BG.jpg') }}");
+            background-size: cover;
+            background-position: center;
+            min-height: 100vh;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        nav {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 30px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 999;
+        }
+
+        .navtitle {
+            font-size: 20px;
+            font-weight: 700;
+            color: #004d80;
+        }
+
+        .navbutton {
+            display: flex;
+            gap: 10px;
+        }
+
+        .navbutton a {
+            text-decoration: none;
+            color: #007acc;
+            font-weight: 500;
+            padding: 8px 16px;
+            border: 2px solid #007acc;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .navbutton a:hover {
+            background: #007acc;
+            color: white;
+        }
+
+        .request-container {
+            max-width: 1100px;
+            margin: 40px auto;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(15px);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        h2 {
+            text-align: center;
+            color: #004d80;
+            margin-bottom: 30px;
+            font-size: 32px;
+            font-weight: 700;
+        }
+
+        h2::after {
+            content: '';
+            display: block;
+            width: 60px;
+            height: 4px;
+            background: linear-gradient(to right, #007acc, #004d80);
+            margin: 10px auto;
+            border-radius: 2px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+            font-size: 15px;
+        }
+
+        th {
+            background: #007acc;
+            color: white;
+            font-size: 16px;
+        }
+
+        tr:hover {
+            background: rgba(0, 122, 204, 0.1);
+        }
+
+        button.complete-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        button.complete-btn:hover {
+            background: #218838;
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="navtitle">SmartDocs System</div>
+        <div class="navbutton">
+            <a href="{{ url_for('requestboard') }}">Request Board</a>
+            <a href="{{ url_for('track') }}">Track</a>
+            <a href="{{ url_for('requestdocument') }}">Make a Request</a>
+            <a href="{{ url_for('home') }}">Home</a>
+            <a href="{{ url_for('about') }}">About</a>
+            <a href="{{ url_for('notification') }}">Notification</a>
+            <a href="{{ url_for('profile') }}">Profile</a>
+            <a href="{{ url_for('history') }}">History</a>
+            <a href="{{ url_for('main') }}">Logout</a>
+        </div>
+    </nav>
+
+    <div class="request-container">
+        <h2>Track Documents</h2>
+
+        <table>
+            <tr>
+                <th>Date Requested</th>
+                <th>Document Type</th>
+                <th>Purpose</th>
+                <th>Contact</th>
+                <th>Address</th>
+                <th>Status</th>
+                <th></th>
+            </tr>
+
+            {% for r in requests %}
+            <tr>
+                <td>{{ r.date_requested.strftime('%Y-%m-%d') if r.date_requested else 'N/A' }}</td>
+                <td>{{ r.document_type }}</td>
+                <td>{{ r.purpose }}</td>
+                <td>{{ r.contact }}</td>
+                <td>{{ r.address }}</td>
+                <td>{{ r.status }}</td>
+                <td>
+                    {% if r.status == 'Out for Delivery' %}
+                    <form method="POST" action="{{ url_for('mark_complete', req_id=r.id) }}">
+                        <button type="submit" class="complete-btn" onclick="return confirm('Mark this request as completed?');">
+                            Complete
+                        </button>
+                    </form>
+                    {% elif r.status == 'Completed' %}
+                        Completed
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+</body>
+</html>

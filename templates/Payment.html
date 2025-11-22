@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Payment</title>
+
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined">
+
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+        font-family: 'Roboto', sans-serif;
+        background: linear-gradient(rgba(0,77,128,0.7), rgba(0,122,204,0.7)),
+                    url("{{ url_for('static', filename='BG.jpg') }}") center/cover no-repeat;
+        min-height: 100vh;
+        color: #333;
+    }
+
+    nav {
+        width: 100%;
+        background: rgba(255,255,255,0.95);
+        backdrop-filter: blur(10px);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px 30px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        position: sticky;
+        top: 0;
+        z-index: 999;
+    }
+
+    .navtitle {
+        font-size: 20px;
+        font-weight: 700;
+        color: #004d80;
+    }
+
+    .navbutton {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    .navbutton a,
+    .dropbtn {
+        text-decoration: none;
+        color: #007acc;
+        font-weight: 500;
+        padding: 8px 16px;
+        border: 2px solid #007acc;
+        border-radius: 20px;
+        transition: 0.3s ease;
+        font-size: 14px;
+        background: white;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .navbutton a:hover,
+    .dropbtn:hover {
+        background: #007acc;
+        color: white;
+    }
+
+    .dropdown { position: relative; }
+
+    .dropdown-content {
+        display: none;
+        position: absolute;
+        right: 0;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        padding: 8px 0;
+        min-width: 60px;
+        z-index: 10;
+    }
+
+    .dropdown-content a {
+        all: unset;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 45px;
+        height: 40px;
+        margin: 4px auto;
+        cursor: pointer;
+        border-radius: 10px;
+    }
+
+    .dropdown-content a i {
+        font-size: 22px;
+        color: #007acc;
+        transition: 0.2s;
+    }
+
+    .dropdown-content a:hover { background: #e6f3ff; }
+    .dropdown-content a:hover i { color: #004d80; }
+
+    .dropdown:hover .dropdown-content { display: block; }
+
+    .payment-container {
+        max-width: 500px;
+        margin: 50px auto;
+        background: rgba(255,255,255,0.95);
+        backdrop-filter: blur(15px);
+        padding: 40px;
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+        text-align: center;
+    }
+
+    .payment-container h2 {
+        color: #004d80;
+        margin-bottom: 25px;
+    }
+
+    .qr-code img {
+        width: 200px;
+        height: 200px;
+        object-fit: contain;
+        margin-bottom: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    .ref-input {
+        margin-bottom: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .ref-input label {
+        margin-bottom: 5px;
+        font-weight: 600;
+        color: #004d80;
+    }
+
+    .ref-input input {
+        width: 80%;
+        padding: 10px 15px;
+        border-radius: 12px;
+        border: 2px solid #007acc;
+        outline: none;
+        font-size: 14px;
+        transition: 0.3s;
+    }
+
+    .ref-input input:focus { border-color: #004d80; }
+
+    .upload-btn {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .upload-btn button {
+        padding: 10px 25px;
+        background: #007acc;
+        color: white;
+        font-weight: 600;
+        border: none;
+        border-radius: 20px;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+    .upload-btn button:hover { background: #004d80; }
+
+    @media (max-width: 768px) {
+        nav { padding: 10px 15px; flex-wrap: wrap; }
+        .navtitle { width: 100%; text-align: center; margin-bottom: 10px; }
+        .navbutton { justify-content: center; }
+        .qr-code img { width: 150px; height: 150px; }
+        .ref-input input { width: 100%; }
+        .payment-container { padding: 25px; }
+    }
+</style>
+</head>
+
+<body>
+
+<nav>
+    <div class="navtitle">RequestHub</div>
+
+    <div class="navbutton">
+        <a href="{{ url_for('home') }}"><i class="material-icons">home</i></a>
+        <a href="{{ url_for('requestdocument') }}"><span class="material-symbols-outlined">request_page</span></a>
+        <a href="{{ url_for('myorders') }}"><span class="material-symbols-outlined">orders</span></a>
+        <a href="{{ url_for('about') }}"><i class="material-icons">info</i></a>
+        <a href="{{ url_for('notification') }}"><i class="material-icons">notifications</i></a>
+
+        <div class="dropdown">
+            <button class="dropbtn"><i class="material-icons">menu</i></button>
+            <div class="dropdown-content">
+                <a href="{{ url_for('profile') }}"><i class="material-icons">person</i></a>
+                <a href="{{ url_for('main') }}"><i class="material-icons">logout</i></a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="payment-container">
+    <h2>Payment</h2>
+
+    <div class="qr-code">
+        <img src="{{ url_for('static', filename='PAYMENT.jpg') }}" alt="QR Code">
+    </div>
+
+    <form action="{{ url_for('payment', request_id=req.id) }}" method="POST" enctype="multipart/form-data">
+        <div class="ref-input">
+            <label for="reference">Reference No:</label>
+            <input type="text" id="reference" name="reference" required placeholder="Enter Reference No">
+        </div>
+
+        <div class="ref-input">
+            <label for="amount-paid">Amount Paid:</label>
+            <input type="text" id="amount-paid" name="amount_paid" required placeholder="Enter Amount">
+        </div>
+
+        <div class="upload-btn">
+            <input type="file" id="payment-proof" name="payment_proof" required>
+            <button type="submit">Upload Payment Proof</button>
+        </div>
+    </form>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Profile</title>
+
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined">
+
+    <style>
+        html {
+            overflow-y: scroll;
+            scroll-behavior: smooth;
+        }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(rgba(0, 77, 128, 0.7), rgba(0, 122, 204, 0.7)),
+                        url("{{ url_for('static', filename='BG.jpg') }}");
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            min-height: 100vh;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        nav {
+            width: 100%;
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 999;
+        }
+
+        .navtitle {
+            font-size: 20px;
+            font-weight: 700;
+            color: #004d80;
+        }
+
+        .navbutton {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .navbutton a, 
+        .dropbtn {
+            text-decoration: none;
+            color: #007acc;
+            font-weight: 500;
+            padding: 8px 16px;
+            border: 2px solid #007acc;
+            border-radius: 20px;
+            transition: 0.3s ease;
+            font-size: 14px;
+            background: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .navbutton a:hover, 
+        .dropbtn:hover {
+            background: #007acc;
+            color: white;
+        }
+
+
+        .dropdown {
+            position: relative;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+            padding: 8px 0;
+            min-width: 60px;
+            z-index: 10;
+        }
+
+        .dropdown-content a {
+            all: unset;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 45px;
+            height: 40px;
+            margin: 4px auto;
+            cursor: pointer;
+            border-radius: 10px;
+        }
+
+        .dropdown-content a i {
+            font-size: 22px;
+            color: #007acc;
+            transition: 0.2s;
+        }
+
+        .dropdown-content a:hover {
+            background: #e6f3ff;
+        }
+
+        .dropdown-content a:hover i {
+            color: #004d80;
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        .profile-container {
+            max-width: 600px;
+            margin: 40px auto;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(15px);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            animation: fadeInUp 1s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2 {
+            text-align: center;
+            color: #004d80;
+            margin-bottom: 30px;
+            font-size: 32px;
+            font-weight: 700;
+        }
+
+        h2::after {
+            content: '';
+            display: block;
+            width: 60px;
+            height: 4px;
+            background: linear-gradient(to right, #007acc, #004d80);
+            margin: 10px auto;
+            border-radius: 2px;
+        }
+
+        .profileinfo {
+            line-height: 1.8;
+            color: #00334d;
+            font-size: 17px;
+        }
+
+        .profileinfo p {
+            margin-bottom: 15px;
+        }
+
+        .profileinfo label {
+            font-weight: bold;
+            color: #004d80;
+        }
+
+        .editbutton {
+            display: block;
+            width: 100%;
+            margin-top: 25px;
+            padding: 12px;
+            background: #007acc;
+            color: white;
+            font-weight: 500;
+            border: 2px solid #007acc;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 16px;
+            text-align: center;
+            text-decoration: none;
+        }
+
+        .editbutton:hover {
+            background: white;
+            color: #007acc;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 122, 204, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            nav { padding: 10px 15px; flex-wrap: wrap; }
+            .navtitle { width: 100%; text-align: center; margin-bottom: 10px; }
+            .navbutton { justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="navtitle">RequestHub</div>
+
+        <div class="navbutton">
+            <a href="{{ url_for('home') }}"><i class="material-icons">home</i></a>
+            <a href="{{ url_for('requestdocument') }}"><span class="material-symbols-outlined">request_page</span></a>
+            <a href="{{ url_for('myorders') }}"><span class="material-symbols-outlined">orders</span></a>
+            <a href="{{ url_for('about') }}"><i class="material-icons">info</i></a>
+            <a href="{{ url_for('notification') }}"><i class="material-icons">notifications</i></a>
+
+            <div class="dropdown">
+                <button class="dropbtn"><i class="material-icons">menu</i></button>
+                <div class="dropdown-content">
+                    <a href="{{ url_for('profile') }}"><i class="material-icons">person</i></a>
+                    <a href="{{ url_for('main') }}"><i class="material-icons">logout</i></a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="profile-container">
+        <h2>My Profile</h2>
+
+        <div class="profileinfo">
+            <p><label>Full Name:</label> {{ user.fullname }}</p>
+            <p><label>Username:</label> {{ user.username }}</p>
+            <p><label>Email:</label> {{ user.email }}</p>
+            <p><label>Address:</label> {{ user.address }}</p>
+            <p><label>Contact:</label> {{ user.contact }}</p>
+            <p><label>Date of Birth:</label> {{ user.dob }}</p>
+            <p><label>Gender:</label> {{ user.gender }}</p>
+        </div>
+
+        <a href="{{ url_for('editprofile') }}" class="editbutton">Edit Profile</a>
+    </div>
+
+</body>
+</html>
