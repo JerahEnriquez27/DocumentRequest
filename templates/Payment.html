@@ -219,8 +219,20 @@
     <form action="{{ url_for('payment', request_id=req.id) }}" method="POST" enctype="multipart/form-data">
         <div class="ref-input">
             <label for="reference">Reference No:</label>
-            <input type="text" id="reference" name="reference" required placeholder="Enter Reference No">
+            <input 
+                type="text" 
+                id="reference" 
+                name="reference" 
+                required
+                placeholder="Enter Reference No"
+                maxlength="9"
+                pattern="\d{9}"
+                oninput="validateReference()"
+                title="Reference number must be exactly 9 digits."
+            >
+            <div id="reference-error" style="color: red; margin-top: 5px;"></div>
         </div>
+
 
         <div class="ref-input">
             <label for="amount-paid">Amount Paid:</label>
@@ -228,11 +240,84 @@
         </div>
 
         <div class="upload-btn">
-            <input type="file" id="payment-proof" name="payment_proof" required>
+            <input 
+                type="file" 
+                id="payment-proof" 
+                name="payment_proof" 
+                required
+                onchange="validateFile()"
+            >
+            <div id="file-error" style="color: red; margin-top: 5px;"></div>
             <button type="submit">Upload Payment Proof</button>
         </div>
     </form>
 </div>
 
+    <script>
+        function validateReference() {
+            const refInput = document.getElementById("reference");
+            const errorDiv = document.getElementById("reference-error");
+            const value = refInput.value;
+
+            refInput.value = value.replace(/[^0-9]/g, '');
+
+            if (value.length === 0) {
+                refInput.style.borderColor = '#007acc';
+                errorDiv.textContent = '';
+            } else if (/^\d{9}$/.test(refInput.value)) {
+                refInput.style.borderColor = 'green';
+                errorDiv.textContent = '';
+            } else {
+                refInput.style.borderColor = 'red';
+                errorDiv.textContent = 'Reference number must be exactly 9 digits.';
+            }
+        }
+
+        function validateFile() {
+            const fileInput = document.getElementById("payment-proof");
+            const fileError = document.getElementById("file-error");
+
+            if (!fileInput.files || fileInput.files.length === 0) {
+                fileError.textContent = "Please upload your payment proof.";
+                fileInput.style.borderColor = "red";
+                return false;
+            }
+
+            const file = fileInput.files[0];
+
+            const allowedTypes = ["image/jpeg", "image/png"];
+            const allowedExt = ["jpg", "jpeg", "png"];
+
+            const ext = file.name.split(".").pop().toLowerCase();
+
+            if (!allowedTypes.includes(file.type) || !allowedExt.includes(ext)) {
+                fileError.textContent = "Invalid file type. Allowed: JPG, JPEG, PNG.";
+                fileInput.style.borderColor = "red";
+                fileInput.value = "";
+                return false;
+            }
+
+            fileError.textContent = "";
+            fileInput.style.borderColor = "green";
+            return true;
+        }
+
+        document.querySelector("form").addEventListener("submit", function(e) {
+            const refValid = /^\d{9}$/.test(document.getElementById("reference").value);
+            const fileValid = validateFile();
+
+            if (!refValid) {
+                document.getElementById("reference").style.borderColor = 'red';
+                document.getElementById("reference-error").textContent = 'Reference number must be exactly 9 digits.';
+            }
+
+            if (!refValid || !fileValid) {
+                e.preventDefault();
+            }
+        });
+        </script>
+
+
 </body>
 </html>
+
