@@ -139,10 +139,32 @@
         text-decoration: underline;
     }
 
+    .error-box {
+        background: #ffdddd;
+        border: 1px solid #ff5c5c;
+        padding: 12px;
+        border-radius: 8px;
+        margin-bottom: 15px;
+        color: #b30000;
+        font-weight: 500;
+        animation: fadeIn 0.3s ease-out;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-5px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
 </style>
 <body>
     <div class="box">
         <h2>Login</h2>
+
+        {% if error %}
+        <div class="error-box">
+            {{ error }}
+        </div>
+        {% endif %}
 
         <form action="{{ url_for('login') }}" method="POST">
             <label for="username">Username</label>
