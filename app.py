@@ -1,3 +1,7 @@
+from email.mime.text import MIMEText
+import random
+import smtplib
+import time
 from flask import Flask, jsonify, render_template, request, redirect, url_for, session
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
@@ -13,7 +17,7 @@ app = Flask(__name__)
 app.secret_key = 'SecretNaPassword'
 
 UPLOAD_FOLDER = "static/payment_proofs"
-ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "pdf"}
+ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg"}
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
@@ -29,6 +33,58 @@ def get_db_connection():
     except Error as e:
         print(f"Error connecting to MySQL: {e}")
         return None
+    
+# --------------------- OTP GENERATOR ---------------------
+def generate_otp():
+    return str(random.randint(100000, 999999))
+
+# --------------------- SEND EMAIL FUNCTION ---------------------
+def send_email_otp(receiver_email, otp):
+
+    sender_email = "enriquezsantillanjerah@gmail.com"
+    sender_password = "kihj scvu tsty rxof"
+
+    subject = "Your OTP Code"
+    body = f"Your OTP code is: {otp}\nThis will expire in 5 minutes."
+
+    msg = MIMEText(body)
+    msg["From"] = sender_email
+    msg["To"] = receiver_email
+    msg["Subject"] = subject
+
+    try:
+        with smtplib.SMTP_SSL("smtp.gmail.com", 465) as smtp:
+            smtp.login(sender_email, sender_password)
+            smtp.sendmail(sender_email, receiver_email, msg.as_string())
+        return True
+
+    except Exception as e:
+        print("Email error:", e)
+        return False
+
+
+# --------------------- SEND OTP ROUTE ---------------------
+@app.route("/send_otp", methods=["POST"])
+def send_otp():
+    email = request.form.get("email")
+
+    if not email:
+        return jsonify({"success": False, "message": "Email is required."}), 400
+
+    otp = generate_otp()
+    session["otp"] = otp
+    session["otp_expiry"] = time.time() + 300
+
+    sent = send_email_otp(email, otp)
+
+    if not sent:
+        return jsonify({
+            "success": False,
+            "message": "Failed to send OTP. Check your email settings."
+        }), 500
+
+    return jsonify({"success": True, "message": "OTP sent successfully!"})
+
 
 
 #----------Main Route-------------------------------------------
@@ -158,7 +214,19 @@ def login():
 #----------Register Route--------------------------------------
 @app.route('/register', methods=['GET', 'POST'])
 def register():
-    if request.method == 'POST':
+    if request.method == "POST":
+
+        entered_otp = request.form.get("otp")
+
+        if "otp" not in session or "otp_expiry" not in session:
+            return "OTP not generated. Please request OTP again.", 400
+
+        if time.time() > session["otp_expiry"]:
+            return "OTP expired. Please request a new one.", 400
+
+        if entered_otp != session["otp"]:
+            return "Invalid OTP. Please try again.", 400
+
         fullname = request.form['fullname']
         username = request.form['username']
         email = request.form['email']
@@ -177,9 +245,10 @@ def register():
 
         with get_db_connection() as conn:
             cursor = conn.cursor(dictionary=True)
-
-            cursor.execute("SELECT * FROM users WHERE username = %s OR email = %s", 
-                           (username, email))
+            cursor.execute(
+                "SELECT * FROM users WHERE username=%s OR email=%s",
+                (username, email)
+            )
             existing_user = cursor.fetchone()
 
             if existing_user:
@@ -192,10 +261,13 @@ def register():
             """, (fullname, username, email, address, contact, gender, dob, hashed_password, role))
             conn.commit()
 
-            
-        return redirect(url_for('login'))
+        session.pop("otp", None)
+        session.pop("otp_expiry", None)
 
-    return render_template('register.html')
+        return "Registration successful!"
+
+    return render_template("register.html")
+
 
 
 
@@ -540,7 +612,7 @@ def mark_complete(req_id):
             cursor.execute("SELECT name FROM documents WHERE id=%s", (req['document_id'],))
             doc_name = cursor.fetchone()['name']
 
-            message = f"Your request for '{doc_name}' has been completed."
+            message = f"Your request for {doc_name} has been completed."
             cursor.execute("INSERT INTO notifications (user_id, message) VALUES (%s, %s)", (user_id, message))
 
             conn.commit()
@@ -971,4 +1043,4 @@ def update_status(req_id):
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0', port=int(os.getenv("PORT", 5000)))
