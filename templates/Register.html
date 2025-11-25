@@ -121,6 +121,40 @@
         box-shadow: 0 6px 20px rgba(0, 122, 204, 0.4);
     }
 
+    .otp-button {
+        width: 100%;
+        height: 45px;
+        background: linear-gradient(45deg, #007acc, #004d80);
+        border: none;
+        color: white;
+        font-weight: 600;
+        border-radius: 10px;
+        margin-top: 15px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 16px;
+        box-shadow: 0 4px 15px rgba(0, 122, 204, 0.3);
+    }
+
+    .otp-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 122, 204, 0.4);
+    }
+
+    .otp-button:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+    }
+
+    #message {
+        margin-top: 15px;
+        font-size: 14px;
+        color: #007acc;
+        font-weight: 500;
+    }
+
     p {
         font-size: 16px;
         margin-top: 20px;
@@ -185,6 +219,11 @@
 
             <label for="email">Email</label>
             <input type="email" name="email" placeholder="Enter email address" required>
+            <button type="button" class="otp-button" id="send-otp">Send OTP</button>
+            <div id="message"></div>
+
+            <label for="otp">OTP Code</label>
+            <input type="text" name="otp" placeholder="Enter OTP code" required>
 
             <div>
                 <label for="address">Address</label>
@@ -192,7 +231,8 @@
             </div>
 
             <label for="contact">Contact</label>
-            <input type="text" name="contact" placeholder="Enter contact number" required>
+            <input type="text" name="contact" id="contact" placeholder="Enter contact number" requiredmaxlength="11" pattern="\d{11}" title="Phone number must be exactly 11 digits.">
+            <div id="contact-error" style="color: red; margin-top: 5px;"></div>
 
             <label for="dob">Date of Birth</label>
             <input type="date" name="dob">
@@ -216,5 +256,132 @@
 
         <p>Already have an account? <a href="{{ url_for('login') }}">Login here</a></p>
     </div>
+
+    <script>
+        document.getElementById('send-otp').addEventListener('click', function() {
+            const email = document.querySelector('input[name="email"]').value;
+            const messageDiv = document.getElementById('message');
+            const button = document.getElementById('send-otp');
+
+            if (!email) {
+                messageDiv.textContent = 'Please enter an email address first.';
+                messageDiv.style.color = 'red';
+                return;
+            }
+
+            button.disabled = true;
+            button.textContent = 'Sending...';
+
+            fetch('/send_otp', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: `email=${encodeURIComponent(email)}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                messageDiv.textContent = data.message;
+                messageDiv.style.color = data.success ? 'green' : 'red';
+                button.textContent = 'Send OTP';
+                if (data.success) {
+                    setTimeout(() => {
+                        button.disabled = false;
+                    }, 30000);
+                } else {
+                    button.disabled = false;
+                }
+            })
+            .catch(error => {
+                messageDiv.textContent = 'An error occurred. Please try again.';
+                messageDiv.style.color = 'red';
+                button.disabled = false;
+                button.textContent = 'Send OTP';
+            });
+        });
+    </script>
+    <script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const form = document.querySelector("form");
+        const otpError = document.createElement("div");
+
+        otpError.style.color = "red";
+        otpError.style.marginTop = "5px";
+
+        const otpInput = document.querySelector('input[name="otp"]');
+        otpInput.insertAdjacentElement("afterend", otpError);
+
+        form.addEventListener("submit", (event) => {
+            event.preventDefault();
+
+            const formData = new FormData(form);
+
+            fetch("/register", {
+                method: "POST",
+                body: formData
+            })
+            .then(async res => {
+                const type = res.headers.get("Content-Type");
+
+                if (type && type.includes("application/json")) {
+                    return res.json();
+                }
+                return res.text();
+            })
+            .then(data => {
+                let message = "";
+
+                if (typeof data === "string") {
+                    message = data;
+                } else if (data && data.message) {
+                    message = data.message;
+                }
+
+                const otpErrors = ["invalid otp", "expired", "not generated"];
+
+                if (otpErrors.some(err => message.toLowerCase().includes(err))) {
+                    otpError.textContent = message;
+                    otpInput.style.borderColor = "red";
+                    return;
+                }
+
+                otpError.textContent = "";
+                otpInput.style.borderColor = "";
+
+                alert("Registration Successful!");
+                window.location.href = "/login";
+            })
+            .catch(err => {
+                console.error(err);
+                otpError.textContent = "Something went wrong.";
+                otpInput.style.borderColor = "red";
+            });
+        });
+    });
+    </script>
+    <script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const contactInput = document.getElementById("contact");
+        const contactError = document.getElementById("contact-error");
+
+        contactInput.addEventListener("input", () => {
+            contactInput.value = contactInput.value.replace(/\D/g, "");
+
+            if (contactInput.value.length === 0) {
+                contactInput.style.borderColor = "#b3d9ff";
+                contactError.textContent = "";
+                return;
+            }
+
+            if (contactInput.value.length !== 11) {
+                contactInput.style.borderColor = "red";
+                contactError.textContent = "Phone number must be exactly 11 digits.";
+            } else {
+                contactInput.style.borderColor = "green";
+                contactError.textContent = "";
+            }
+        });
+    });
+    </script>
 </body>
 </html>
